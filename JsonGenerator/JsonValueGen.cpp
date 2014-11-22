@@ -4,7 +4,7 @@
  */
 
 #include "EscapedString.h"
-#include "JsonValue.h"
+#include "JsonValueGen.h"
 
 using namespace ArduinoJson::Generator;
 using namespace ArduinoJson::Internals;

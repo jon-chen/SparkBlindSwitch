@@ -76,7 +76,7 @@ namespace ArduinoJson
 
             operator float()
             {
-                return static_cast<float>(_content.asDouble);
+                return (float)_content.asDouble;
             }
 
             operator int()
