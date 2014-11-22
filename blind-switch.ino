@@ -1,7 +1,7 @@
 #include "SparkDebug.h"
 #include "Sparky.h"
 #include "SparkTime.h"
-#include "LightTimer.h"
+#include "BlindSwitch.h"
 
 #ifdef SPARK_DEBUG
 const String astronomyApiUrl = "http://spark-light-timer.googlecode.com/git/sample-astronomy.json";
@@ -9,7 +9,7 @@ const String astronomyApiUrl = "http://spark-light-timer.googlecode.com/git/samp
 const String astronomyApiUrl = "http://api.wunderground.com/api/91329161b08b1483/astronomy/q/30329.json";
 #endif
 
-LightTimer* timer;
+BlindSwitch* bs;
 UDP* udpClient;
 SparkTime* rtc;
 SwitchSchedulerConfiguration* config;
@@ -32,13 +32,13 @@ void setup()
     config->homeOnlyModeEnabled = false;
     // config->homeOnlyModeEnabled = true;
 
-    timer = new LightTimer(config, rtc);
-    timer->setOutletSwitchPin(D7);
-    timer->addSchedule(new SwitchSchedulerTask("sunset", "23:59", &schedulerHandler));
-    // timer->addSchedule(new SwitchSchedulerTask("sunset", "02:30", &schedulerHandler));
-    // timer->addSchedule(new SwitchSchedulerTask("23:35", "23:40", &schedulerHandler));
-    // timer->addSchedule(new SwitchSchedulerTask("23:45", "23:50", &schedulerHandler));
-    // timer->addSchedule(new SwitchSchedulerTask("23:55", "00:00", &schedulerHandler));
+    bs = new BlindSwitch(config, rtc);
+    bs->setOutletSwitchPin(D7);
+    bs->addSchedule(new SwitchSchedulerTask("sunset", "23:59", &schedulerHandler));
+    // bs->addSchedule(new SwitchSchedulerTask("sunset", "02:30", &schedulerHandler));
+    // bs->addSchedule(new SwitchSchedulerTask("23:35", "23:40", &schedulerHandler));
+    // bs->addSchedule(new SwitchSchedulerTask("23:45", "23:50", &schedulerHandler));
+    // bs->addSchedule(new SwitchSchedulerTask("23:55", "00:00", &schedulerHandler));
 
     Spark.function("configure", configureHandler);
     Spark.function("identify", identifyHandler);
@@ -72,14 +72,14 @@ void setup()
         delay(1000);
     }
 
-    timer->initialize();
+    bs->initialize();
 }
 
 void loop()
 {
-    timer->tick();
+    bs->tick();
 
-    char* tmp = const_cast<char*>(timer->getCurrentState());
+    char* tmp = const_cast<char*>(bs->getCurrentState());
     strcpy(currentState, tmp);
 
     // DEBUG_PRINT(currentState);
@@ -91,13 +91,13 @@ void loop()
 
 void schedulerHandler(int state)
 {
-    timer->schedulerCallback(
+    bs->schedulerCallback(
         static_cast<SwitchSchedulerEvent::SwitchSchedulerEventEnum>(state));
 }
 
 int configureHandler(String command)
 {
-    return timer->configureHandler(command);
+    return bs->configureHandler(command);
 }
 
 int identifyHandler(String command)
